@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { Box, Button } from "../styles";
+import { UserContext } from "../contexts/UserContext";
 
 function RecipeList() {
   const [recipes, setRecipes] = useState([]);
@@ -15,7 +16,7 @@ function RecipeList() {
 
   return (
     <Wrapper>
-      {recipes.length > 0 ? (
+      {recipes && recipes.length > 0 ? (
         recipes.map((recipe) => (
           <Recipe key={recipe.id}>
             <Box>

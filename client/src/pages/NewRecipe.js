@@ -1,12 +1,17 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useHistory } from "react-router";
 import styled from "styled-components";
 import ReactMarkdown from "react-markdown";
 import { Button, Error, FormField, Input, Label, Textarea } from "../styles";
+import { UserContext } from "../contexts/UserContext";
 
-function NewRecipe({ user }) {
+function NewRecipe() {
+  const { user } = useContext(UserContext);
   const [title, setTitle] = useState("My Awesome Recipe");
-  const [minutesToComplete, setMinutesToComplete] = useState("30");
+  const [minutesToComplete, setMinutesToComplete] = useState(30);
+  const [errors, setErrors] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const history = useHistory();
   const [instructions, setInstructions] = useState(`Here's how you make it.
   
 ## Ingredients
@@ -18,19 +23,20 @@ function NewRecipe({ user }) {
 
 **Mix** sugar and spice. _Bake_ for 30 minutes.
   `);
-  const [errors, setErrors] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const history = useHistory();
-
+  console.log("user=>>>>" + user);
   function handleSubmit(e) {
     e.preventDefault();
+
+    const userId = user && user.id;
     setIsLoading(true);
+
     fetch("/recipes", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
+        user_id: userId,
         title,
         instructions,
         minutes_to_complete: minutesToComplete,
@@ -38,7 +44,7 @@ function NewRecipe({ user }) {
     }).then((r) => {
       setIsLoading(false);
       if (r.ok) {
-        history.push("/");
+        history.push("/home");
       } else {
         r.json().then((err) => setErrors(err.errors));
       }

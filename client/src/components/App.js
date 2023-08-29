@@ -1,38 +1,38 @@
-import React, { useEffect, useState } from "react";
-import { Switch, Route } from "react-router-dom";
-import NavBar from "./NavBar";
+import React, { useContext } from "react";
+import { Route, Switch } from "react-router-dom";
+import { UserContext } from "../contexts/UserContext";
 import Login from "../pages/Login";
-import RecipeList from "../pages/RecipeList";
 import NewRecipe from "../pages/NewRecipe";
+import RecipeList from "../pages/RecipeList";
+import NavBar from "./NavBar";
 
 function App() {
-  const [user, setUser] = useState(null);
+  const { user } = useContext(UserContext);
 
-  useEffect(() => {
-    // auto-login
-    fetch("/me").then((r) => {
-      if (r.ok) {
-        r.json().then((user) => setUser(user));
-      }
-    });
-  }, []);
-
-  if (!user) return <Login onLogin={setUser} />;
+  console.log(user);
 
   return (
-    <>
-      <NavBar user={user} setUser={setUser} />
-      <main>
+    <main>
+      {user ? (
+        <>
+          <NavBar />
+          <Switch>
+            <Route path="/new">
+              <NewRecipe />
+            </Route>
+            <Route path="/home">
+              <RecipeList />
+            </Route>
+          </Switch>
+        </>
+      ) : (
         <Switch>
-          <Route path="/new">
-            <NewRecipe user={user} />
-          </Route>
           <Route path="/">
-            <RecipeList />
+            <Login />
           </Route>
         </Switch>
-      </main>
-    </>
+      )}
+    </main>
   );
 }
 
